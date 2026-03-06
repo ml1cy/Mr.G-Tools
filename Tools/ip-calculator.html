@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IP/Subnet Calculator - Mr.G Tools</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px; }
+        .container { max-width: 900px; margin: 0 auto; }
+        header { text-align: center; color: white; margin-bottom: 40px; padding: 20px; }
+        header h1 { font-size: 2.5em; margin-bottom: 10px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }
+        .back-btn { display: inline-block; background: rgba(255,255,255,0.2); color: white; padding: 10px 20px; border-radius: 5px; text-decoration: none; margin-bottom: 20px; border: 1px solid white; transition: 0.3s; }
+        .back-btn:hover { background: rgba(255,255,255,0.3); }
+        .tool-card { background: white; border-radius: 10px; padding: 30px; box-shadow: 0 8px 16px rgba(0,0,0,0.2); }
+        .tool-card h2 { color: #667eea; margin-bottom: 20px; font-size: 1.8em; border-bottom: 2px solid #667eea; padding-bottom: 10px; }
+        label { display: block; margin-top: 15px; margin-bottom: 5px; color: #333; font-weight: 500; }
+        input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-family: 'Courier New', monospace; }
+        .tool-button { width: 100%; padding: 12px; background: #667eea; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 1em; font-weight: bold; transition: background 0.3s; margin-top: 15px; }
+        .tool-button:hover { background: #764ba2; }
+        .subnet-info { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
+        .info-item { background: #f5f5f5; padding: 15px; border-radius: 5px; border-left: 4px solid #667eea; }
+        .info-label { font-weight: bold; color: #667eea; font-size: 0.85em; }
+        .info-value { font-family: 'Courier New', monospace; margin-top: 8px; word-break: break-all; color: #333; }
+        .error { color: #ff4444; font-size: 0.9em; margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="../index.html" class="back-btn">← Back to Tools</a>
+        <header>
+            <h1>🌐 IP/Subnet Calculator</h1>
+            <p>Calculate network ranges and subnet information</p>
+        </header>
+        
+        <div class="tool-card">
+            <h2>IP/Subnet Calculator</h2>
+            <label>IP Address</label>
+            <input type="text" id="ipInput" placeholder="192.168.1.1">
+            <label>CIDR Notation (or Subnet Mask)</label>
+            <input type="text" id="cidrInput" placeholder="24 or 255.255.255.0">
+            <button class="tool-button" onclick="calculateSubnet()">Calculate</button>
+            <div id="subnetOutput"></div>
+        </div>
+    </div>
+
+    <script>
+        function calculateSubnet() {
+            const ip = document.getElementById('ipInput').value;
+            const cidr = document.getElementById('cidrInput').value;
+            const output = document.getElementById('subnetOutput');
+
+            try {
+                let cidrNum = parseInt(cidr);
+                if (cidr.includes('.')) {
+                    cidrNum = maskToCIDR(cidr);
+                }
+
+                if (cidrNum < 0 || cidrNum > 32) throw new Error('Invalid CIDR');
+
+                const ipParts = ip.split('.').map(Number);
+                const mask = (-1 << (32 - cidrNum)) >>> 0;
+
+                const network = ipParts.map((part, i) => (part & (mask >> (i * 8))) & 0xFF).join('.');
+                const broadcast = ipParts.map((part, i) => (part | (~mask >> (i * 8))) & 0xFF).join('.');
+                const firstUsable = incrementIP(network, 1);
+                const lastUsable = decrementIP(broadcast, 1);
+
+                const maskDec = [
+                    (mask >>> 24) & 0xFF,
+                    (mask >>> 16) & 0xFF,
+                    (mask >>> 8) & 0xFF,
+                    mask & 0xFF
+                ].join('.');
+
+                const totalHosts = Math.pow(2, 32 - cidrNum) - 2;
+
+                output.innerHTML = `
+                    <div class="subnet-info">
+                        <div class="info-item"><div class="info-label">Network</div><div class="info-value">${network}/${cidrNum}</div></div>
+                        <div class="info-item"><div class="info-label">Subnet Mask</div><div class="info-value">${maskDec}</div></div>
+                        <div class="info-item"><div class="info-label">First Usable</div><div class="info-value">${firstUsable}</div></div>
+                        <div class="info-item"><div class="info-label">Last Usable</div><div class="info-value">${lastUsable}</div></div>
+                        <div class="info-item"><div class="info-label">Broadcast</div><div class="info-value">${broadcast}</div></div>
+                        <div class="info-item"><div class="info-label">Total Hosts</div><div class="info-value">${totalHosts}</div></div>
+                    </div>
+                `;
+            } catch (e) {
+                output.innerHTML = `<div class="error">Error: ${e.message}</div>`;
+            }
+        }
+
+        function maskToCIDR(mask) {
+            const parts = mask.split('.').map(Number);
+            let cidr = 0;
+            for (let part of parts) {
+                for (let i = 7; i >= 0; i--) {
+                    if ((part >> i) & 1) cidr++;
+                    else break;
+                }
+            }
+            return cidr;
+        }
+
+        function incrementIP(ip, num) {
+            const parts = ip.split('.').map(Number);
+            let val = parts[3] + num;
+            if (val > 255) {
+                parts[3] = val % 256;
+                val = Math.floor(val / 256);
+                parts[2] += val;
+                if (parts[2] > 255) {
+                    parts[2] = parts[2] % 256;
+                    parts[1] += Math.floor(parts[2] / 256);
+                }
+            } else {
+                parts[3] = val;
+            }
+            return parts.join('.');
+        }
+
+        function decrementIP(ip, num) {
+            const parts = ip.split('.').map(Number);
+            let val = parts[3] - num;
+            if (val < 0) {
+                parts[3] = 256 + val;
+                parts[2] -= 1;
+                if (parts[2] < 0) {
+                    parts[2] = 255;
+                    parts[1] -= 1;
+                }
+            } else {
+                parts[3] = val;
+            }
+            return parts.join('.');
+        }
+    </script>
+</body>
+</html>

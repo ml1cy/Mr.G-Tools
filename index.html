@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mr.G Cybersecurity Tools</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            color: white;
+            margin-bottom: 50px;
+            padding: 40px 20px;
+        }
+
+        header h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .tool-link {
+            background: white;
+            border-radius: 10px;
+            padding: 30px 20px;
+            text-align: center;
+            text-decoration: none;
+            color: #333;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+            transition: transform 0.3s, box-shadow 0.3s, background 0.3s;
+            border: 2px solid transparent;
+        }
+
+        .tool-link:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 12px 28px rgba(0,0,0,0.3);
+            background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+            border-color: #667eea;
+        }
+
+        .tool-icon {
+            font-size: 2.5em;
+            margin-bottom: 15px;
+        }
+
+        .tool-link h2 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 1.3em;
+        }
+
+        .tool-link p {
+            color: #666;
+            font-size: 0.9em;
+            line-height: 1.4;
+        }
+
+        footer {
+            text-align: center;
+            color: white;
+            margin-top: 60px;
+            padding: 20px;
+            opacity: 0.8;
+        }
+
+        .tool-count {
+            background: rgba(255,255,255,0.1);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            text-align: center;
+            font-size: 1.1em;
+        }
+
+        .tool-count {
+            background: rgba(255,255,255,0.1);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            text-align: center;
+            font-size: 1.1em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🛡️ Mr.G Cybersecurity Tools</h1>
+            <p>Essential utilities for cybersecurity professionals and students</p>
+        </header>
+
+        <div class="tool-count">
+            <strong>14 Tools Available</strong> - Click any tool to get started
+        </div>
+
+        <div class="tools-grid">
+            <a href="Tools/wheel-of-names.html" class="tool-link">
+                <div class="tool-icon">🎡</div>
+                <h2>Wheel of Names</h2>
+                <p>Randomly select names from a spinning wheel</p>
+            </a>
+
+            <a href="Tools/ip-calculator.html" class="tool-link">
+                <div class="tool-icon">🌐</div>
+                <h2>IP/Subnet Calculator</h2>
+                <p>Calculate network ranges and subnet information</p>
+            </a>
+
+            <a href="Tools/base64-encoder.html" class="tool-link">
+                <div class="tool-icon">🔤</div>
+                <h2>Base64 Encoder/Decoder</h2>
+                <p>Encode and decode Base64 strings</p>
+            </a>
+
+            <a href="Tools/hex-encoder.html" class="tool-link">
+                <div class="tool-icon">🔢</div>
+                <h2>Hex Encoder/Decoder</h2>
+                <p>Convert text to and from hexadecimal</p>
+            </a>
+
+            <a href="Tools/url-encoder.html" class="tool-link">
+                <div class="tool-icon">🔗</div>
+                <h2>URL Encoder/Decoder</h2>
+                <p>Encode and decode URL components</p>
+            </a>
+
+            <a href="Tools/hash-generator.html" class="tool-link">
+                <div class="tool-icon">🔐</div>
+                <h2>Hash Generator</h2>
+                <p>Generate MD5, SHA-1, SHA-256, SHA-512 hashes</p>
+            </a>
+
+            <a href="Tools/password-generator.html" class="tool-link">
+                <div class="tool-icon">🔑</div>
+                <h2>Password Generator</h2>
+                <p>Create strong passwords with custom options</p>
+            </a>
+
+            <a href="Tools/password-strength.html" class="tool-link">
+                <div class="tool-icon">💪</div>
+                <h2>Password Strength Checker</h2>
+                <p>Analyze password security and strength</p>
+            </a>
+
+            <a href="Tools/caesar-cipher.html" class="tool-link">
+                <div class="tool-icon">🔄</div>
+                <h2>Caesar Cipher</h2>
+                <p>Encrypt and decrypt with Caesar cipher</p>
+            </a>
+
+            <a href="Tools/dns-lookup.html" class="tool-link">
+                <div class="tool-icon">🔍</div>
+                <h2>DNS & Domain Info</h2>
+                <p>Get domain and DNS information</p>
+            </a>
+
+            <a href="Tools/ports-reference.html" class="tool-link">
+                <div class="tool-icon">⚡</div>
+                <h2>Common Ports Reference</h2>
+                <p>Search and reference common network ports</p>
+            </a>
+
+            <a href="Tools/text-statistics.html" class="tool-link">
+                <div class="tool-icon">📊</div>
+                <h2>Text Statistics</h2>
+                <p>Analyze text for characters, words, and lines</p>
+            </a>
+
+            <a href="Tools/subnet-converter.html" class="tool-link">
+                <div class="tool-icon">🔄</div>
+                <h2>Subnet Mask Converter</h2>
+                <p>Convert subnet masks and CIDR notation</p>
+            </a>
+
+            <a href="Tools/random-string.html" class="tool-link">
+                <div class="tool-icon">🎲</div>
+                <h2>Random String Generator</h2>
+                <p>Generate random strings with various charsets</p>
+            </a>
+        </div>
+
+        <footer>
+            <p>&copy; 2026 Mr.G Cybersecurity Tools | Designed for educational purposes</p>
+        </footer>
+    </div>
+</body>
+</html>

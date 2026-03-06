@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Common Ports Reference - Mr.G Tools</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px; }
+        .container { max-width: 900px; margin: 0 auto; }
+        header { text-align: center; color: white; margin-bottom: 40px; padding: 20px; }
+        header h1 { font-size: 2.5em; margin-bottom: 10px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }
+        .back-btn { display: inline-block; background: rgba(255,255,255,0.2); color: white; padding: 10px 20px; border-radius: 5px; text-decoration: none; margin-bottom: 20px; border: 1px solid white; transition: 0.3s; }
+        .back-btn:hover { background: rgba(255,255,255,0.3); }
+        .tool-card { background: white; border-radius: 10px; padding: 30px; box-shadow: 0 8px 16px rgba(0,0,0,0.2); }
+        .tool-card h2 { color: #667eea; margin-bottom: 20px; font-size: 1.8em; border-bottom: 2px solid #667eea; padding-bottom: 10px; }
+        label { display: block; margin-top: 15px; margin-bottom: 5px; color: #333; font-weight: 500; }
+        input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; }
+        .tool-output { background: #f5f5f5; padding: 15px; border-radius: 5px; margin-top: 15px; border-left: 4px solid #667eea; }
+        .port-item { background: white; padding: 12px; border-radius: 5px; margin: 8px 0; border-left: 3px solid #667eea; font-family: 'Courier New', monospace; }
+        .port-service { font-weight: bold; color: #667eea; }
+        .port-number { color: #333; }
+        .no-results { color: #ff4444; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="../index.html" class="back-btn">← Back to Tools</a>
+        <header>
+            <h1>⚡ Common Ports Reference</h1>
+            <p>Search and reference common network ports</p>
+        </header>
+        
+        <div class="tool-card">
+            <h2>Common Ports Reference</h2>
+            <label>Search Port or Service:</label>
+            <input type="text" id="portSearch" placeholder="e.g., SSH, 22, HTTP..." oninput="searchPorts()">
+            <div class="tool-output" id="portOutput">Start typing to search...</div>
+        </div>
+    </div>
+
+    <script>
+        function searchPorts() {
+            const search = document.getElementById('portSearch').value.toLowerCase();
+            const ports = {
+                'ssh': 22, 'telnet': 23, 'smtp': 25, 'dns': 53, 'http': 80, 'pop3': 110,
+                'imap': 143, 'https': 443, 'mysql': 3306, 'rdp': 3389, 'postgresql': 5432,
+                'mongodb': 27017, 'ftp': 21, 'sftp': 22, 'ldap': 389, 'snmp': 161, 'ntp': 123,
+                'rtsp': 554, 'sip': 5060, 'sips': 5061, 'xmpp': 5222, 'amqp': 5672, 'redis': 6379
+            };
+
+            const output = document.getElementById('portOutput');
+            if (!search) {
+                output.innerHTML = 'Start typing to search...';
+                return;
+            }
+
+            const results = Object.entries(ports).filter(([service, port]) => 
+                service.includes(search) || port.toString().includes(search)
+            );
+
+            if (results.length > 0) {
+                output.innerHTML = results.map(([service, port]) => 
+                    `<div class="port-item"><span class="port-service">${service.toUpperCase()}</span> - <span class="port-number">Port ${port}</span></div>`
+                ).join('');
+            } else {
+                output.innerHTML = '<div class="no-results">No matching ports found</div>';
+            }
+        }
+    </script>
+</body>
+</html>

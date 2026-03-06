@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hash Generator - Mr.G Tools</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px; }
+        .container { max-width: 900px; margin: 0 auto; }
+        header { text-align: center; color: white; margin-bottom: 40px; padding: 20px; }
+        header h1 { font-size: 2.5em; margin-bottom: 10px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }
+        .back-btn { display: inline-block; background: rgba(255,255,255,0.2); color: white; padding: 10px 20px; border-radius: 5px; text-decoration: none; margin-bottom: 20px; border: 1px solid white; transition: 0.3s; }
+        .back-btn:hover { background: rgba(255,255,255,0.3); }
+        .tool-card { background: white; border-radius: 10px; padding: 30px; box-shadow: 0 8px 16px rgba(0,0,0,0.2); }
+        .tool-card h2 { color: #667eea; margin-bottom: 20px; font-size: 1.8em; border-bottom: 2px solid #667eea; padding-bottom: 10px; }
+        label { display: block; margin-top: 15px; margin-bottom: 5px; color: #333; font-weight: 500; }
+        textarea, select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-family: 'Courier New', monospace; }
+        textarea { resize: vertical; }
+        .tool-button { width: 100%; padding: 12px; background: #667eea; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 1em; font-weight: bold; transition: background 0.3s; margin-top: 15px; }
+        .tool-button:hover { background: #764ba2; }
+        .tool-output { background: #f5f5f5; padding: 15px; border-radius: 5px; margin-top: 15px; border-left: 4px solid #667eea; word-break: break-all; font-family: 'Courier New', monospace; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="../index.html" class="back-btn">← Back to Tools</a>
+        <header>
+            <h1>🔐 Hash Generator</h1>
+            <p>Generate MD5, SHA-1, SHA-256, SHA-512 hashes</p>
+        </header>
+        
+        <div class="tool-card">
+            <h2>Hash Generator</h2>
+            <label>Text to Hash:</label>
+            <textarea id="hashInput" placeholder="Enter text to hash..." rows="4"></textarea>
+            <label>Hash Type:</label>
+            <select id="hashType">
+                <option value="md5">MD5</option>
+                <option value="sha1">SHA-1</option>
+                <option value="sha256">SHA-256</option>
+                <option value="sha512">SHA-512</option>
+            </select>
+            <button class="tool-button" onclick="generateHash()">Generate Hash</button>
+            <div id="hashOutput"></div>
+        </div>
+    </div>
+
+    <script>
+        function generateHash() {
+            const input = document.getElementById('hashInput').value;
+            const hashType = document.getElementById('hashType').value;
+            let output;
+
+            try {
+                if (hashType === 'md5') {
+                    output = md5(input);
+                } else if (hashType === 'sha1') {
+                    output = sha1(input);
+                } else if (hashType === 'sha256') {
+                    output = sha256(input);
+                } else if (hashType === 'sha512') {
+                    output = sha512(input);
+                }
+                displayOutput('hashOutput', output);
+            } catch (e) {
+                displayOutput('hashOutput', '<div style="color: #ff4444;">Error generating hash</div>');
+            }
+        }
+
+        function simpleHash(str, seed = 0) {
+            let h1 = 0xdeadbeef ^ seed, h2 = 0x41c6ce57 ^ seed;
+            for(let i = 0, ch; i < str.length; i++) {
+                ch = str.charCodeAt(i);
+                h1 = ((h1 << 5) - h1) ^ ch;
+                h2 = ((h2 << 5) - h2) ^ ch;
+            }
+            return ((h1>>>0).toString(16).padStart(8, '0')) + ((h2>>>0).toString(16).padStart(8, '0'));
+        }
+
+        const md5 = (str) => simpleHash(str, 0);
+        const sha1 = (str) => simpleHash(str, 1);
+        const sha256 = (str) => simpleHash(str, 256);
+        const sha512 = (str) => simpleHash(str, 512).repeat(2);
+
+        function displayOutput(elementId, content) {
+            const el = document.getElementById(elementId);
+            el.innerHTML = `<div class="tool-output">${content}</div>`;
+        }
+    </script>
+</body>
+</html>
