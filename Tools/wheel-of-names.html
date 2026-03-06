@@ -63,15 +63,36 @@
         let isSpinning = false;
         let wheelRotation = 0;
         let centerImage = null;
+        const centerImageChoices = [
+            'https://raw.githubusercontent.com/ml1cy/Mr.G-Tools/refs/heads/main/mrg.png',
+            'https://raw.githubusercontent.com/ml1cy/Mr.G-Tools/refs/heads/main/mrp.png'
+        ];
 
-        // Load instructor image on page load
-        window.onload = function() {
+        function loadCenterImage(src) {
             const img = new Image();
             img.onload = function() {
                 centerImage = img;
                 drawWheel();
             };
-            img.src = '';
+            img.onerror = function() {
+                if (src !== centerImageChoices[0]) {
+                    loadCenterImage(centerImageChoices[0]);
+                    return;
+                }
+                centerImage = null;
+                drawWheel();
+            };
+            img.src = src;
+        }
+
+        function setRandomCenterImage() {
+            const randomIndex = Math.floor(Math.random() * centerImageChoices.length);
+            loadCenterImage(centerImageChoices[randomIndex]);
+        }
+
+        // Randomly load one of two center images on page load
+        window.onload = function() {
+            setRandomCenterImage();
         };
 
         function addName() {
@@ -185,6 +206,9 @@
 
         function spinWheel() {
             if (wheelNames.length < 2 || isSpinning) return;
+
+            // Pick a random center image for each spin
+            setRandomCenterImage();
             
             isSpinning = true;
             const spins = 5 + Math.random() * 5;
