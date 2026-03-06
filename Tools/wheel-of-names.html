@@ -7,15 +7,15 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px; }
-        .container { max-width: 900px; margin: 0 auto; }
+        .container { max-width: 1200px; margin: 0 auto; }
         header { text-align: center; color: white; margin-bottom: 40px; padding: 20px; }
         header h1 { font-size: 2.5em; margin-bottom: 10px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }
         .back-btn { display: inline-block; background: rgba(255,255,255,0.2); color: white; padding: 10px 20px; border-radius: 5px; text-decoration: none; margin-bottom: 20px; border: 1px solid white; transition: 0.3s; }
         .back-btn:hover { background: rgba(255,255,255,0.3); }
         .tool-card { background: white; border-radius: 10px; padding: 30px; box-shadow: 0 8px 16px rgba(0,0,0,0.2); }
         .tool-card h2 { color: #667eea; margin-bottom: 20px; font-size: 1.8em; border-bottom: 2px solid #667eea; padding-bottom: 10px; }
-        .wheel-container { display: flex; flex-direction: column; align-items: center; gap: 20px; }
-        #wheelCanvas { border: 3px solid #667eea; border-radius: 50%; box-shadow: 0 8px 16px rgba(0,0,0,0.2); cursor: pointer; }
+        .wheel-container { display: flex; flex-direction: column; align-items: center; gap: 28px; }
+        #wheelCanvas { border: 3px solid #667eea; border-radius: 50%; box-shadow: 0 8px 16px rgba(0,0,0,0.2); cursor: pointer; width: min(86vw, 560px); height: min(86vw, 560px); }
         .wheel-controls { width: 100%; max-width: 400px; }
         .name-input-group { display: flex; gap: 8px; margin-bottom: 15px; }
         .name-input-group input { flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 1em; }
@@ -30,6 +30,12 @@
         .clear-btn { background: #ff6b6b !important; }
         .clear-btn:hover { background: #ff5252 !important; }
         .tool-output { background: #f5f5f5; padding: 15px; border-radius: 5px; margin-top: 15px; border-left: 4px solid #667eea; text-align: center; font-size: 1.1em; font-weight: bold; color: #333; }
+        .option-row { display: flex; align-items: center; gap: 8px; margin: 8px 0 10px; color: #333; font-size: 0.95em; }
+        .option-row input { width: auto; }
+
+        @media (max-width: 700px) {
+            .wheel-controls { max-width: 100%; }
+        }
     </style>
 </head>
 <body>
@@ -43,7 +49,7 @@
         <div class="tool-card">
             <h2>Wheel of Names</h2>
             <div class="wheel-container">
-                <canvas id="wheelCanvas" width="300" height="300"></canvas>
+                <canvas id="wheelCanvas" width="560" height="560"></canvas>
                 <div class="wheel-controls">
                     <div class="name-input-group">
                         <input type="text" id="nameInput" placeholder="Enter a name...">
@@ -51,6 +57,11 @@
                     </div>
                     <div class="names-list" id="namesList"></div>
                     <button class="tool-button" onclick="spinWheel()">🎯 SPIN THE WHEEL</button>
+                    <div class="option-row">
+                        <input type="checkbox" id="removeWinnerAuto">
+                        <label for="removeWinnerAuto">Auto-remove winner after each spin</label>
+                    </div>
+                    <button class="tool-button" onclick="removeLastWinner()">Remove Last Winner</button>
                     <button class="tool-button clear-btn" onclick="clearWheel()">Clear All</button>
                     <div class="tool-output" id="wheelResult"></div>
                 </div>
@@ -63,6 +74,7 @@
         let isSpinning = false;
         let wheelRotation = 0;
         let centerImage = null;
+        let lastWinnerName = null;
         const centerImageChoices = [
             'https://raw.githubusercontent.com/ml1cy/Mr.G-Tools/refs/heads/main/mrg.png',
             'https://raw.githubusercontent.com/ml1cy/Mr.G-Tools/refs/heads/main/mrp.png'
@@ -114,6 +126,25 @@
             drawWheel();
         }
 
+        function removeLastWinner() {
+            if (!lastWinnerName) {
+                document.getElementById('wheelResult').innerHTML = 'Spin first to pick a winner.';
+                return;
+            }
+
+            const index = wheelNames.indexOf(lastWinnerName);
+            if (index === -1) {
+                document.getElementById('wheelResult').innerHTML = 'Winner is already removed.';
+                return;
+            }
+
+            wheelNames.splice(index, 1);
+            updateNamesList();
+            drawWheel();
+            document.getElementById('wheelResult').innerHTML = `🗑️ Removed <strong>${lastWinnerName}</strong> from the list.`;
+            lastWinnerName = null;
+        }
+
         function updateNamesList() {
             const list = document.getElementById('namesList');
             list.innerHTML = wheelNames.map((name, i) => 
@@ -126,7 +157,12 @@
             const ctx = canvas.getContext('2d');
             const centerX = canvas.width / 2;
             const centerY = canvas.height / 2;
-            const radius = 140;
+            const radius = canvas.width / 2 - 20;
+            const centerOuterRadius = Math.max(55, radius * 0.34);
+            const centerInnerRadius = centerOuterRadius - 5;
+            const pointerOffset = 26;
+            const pointerWidth = 14;
+            const textFontSize = Math.max(16, Math.floor(radius * 0.12));
 
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -160,16 +196,16 @@
                 ctx.translate(centerX, centerY);
                 ctx.rotate(textAngle);
                 ctx.fillStyle = 'white';
-                ctx.font = 'bold 12px Arial';
+                ctx.font = `bold ${textFontSize}px Arial`;
                 ctx.textAlign = 'right';
                 ctx.textBaseline = 'middle';
-                ctx.fillText(name, radius - 20, 0);
+                ctx.fillText(name, radius - 36, 0);
                 ctx.restore();
             });
 
             // Draw center circle with white background
             ctx.beginPath();
-            ctx.arc(centerX, centerY, 50, 0, 2 * Math.PI);
+            ctx.arc(centerX, centerY, centerOuterRadius, 0, 2 * Math.PI);
             ctx.fillStyle = 'white';
             ctx.fill();
             ctx.strokeStyle = '#667eea';
@@ -180,16 +216,18 @@
             if (centerImage) {
                 ctx.save();
                 ctx.beginPath();
-                ctx.arc(centerX, centerY, 45, 0, 2 * Math.PI);
+                ctx.arc(centerX, centerY, centerInnerRadius, 0, 2 * Math.PI);
                 ctx.clip();
-                
-                const imgSize = 90;
-                ctx.drawImage(centerImage, centerX - imgSize/2, centerY - imgSize/2, imgSize, imgSize);
+
+                ctx.translate(centerX, centerY);
+                ctx.rotate(wheelRotation);
+                const imgSize = centerInnerRadius * 2;
+                ctx.drawImage(centerImage, -imgSize / 2, -imgSize / 2, imgSize, imgSize);
                 ctx.restore();
             } else {
                 // Draw default center circle if no image
                 ctx.beginPath();
-                ctx.arc(centerX, centerY, 15, 0, 2 * Math.PI);
+                ctx.arc(centerX, centerY, Math.max(15, centerInnerRadius * 0.35), 0, 2 * Math.PI);
                 ctx.fillStyle = '#667eea';
                 ctx.fill();
             }
@@ -197,9 +235,9 @@
             // Draw pointer
             ctx.fillStyle = '#667eea';
             ctx.beginPath();
-            ctx.moveTo(centerX, centerY - radius - 20);
-            ctx.lineTo(centerX - 10, centerY - radius - 5);
-            ctx.lineTo(centerX + 10, centerY - radius - 5);
+            ctx.moveTo(centerX, centerY - radius - pointerOffset);
+            ctx.lineTo(centerX - pointerWidth, centerY - radius - 5);
+            ctx.lineTo(centerX + pointerWidth, centerY - radius - 5);
             ctx.closePath();
             ctx.fill();
         }
@@ -211,29 +249,51 @@
             setRandomCenterImage();
             
             isSpinning = true;
-            const spins = 5 + Math.random() * 5;
-            const duration = 3000;
-            const startTime = Date.now();
+            const baseSpins = 8 + Math.random() * 6;
+            const extraAngle = Math.random() * 2 * Math.PI;
+            const totalRotation = baseSpins * 2 * Math.PI + extraAngle;
+            const startRotation = wheelRotation;
+            const duration = 4800;
+            const startTime = performance.now();
 
-            function animate() {
-                const elapsed = Date.now() - startTime;
-                const progress = elapsed / duration;
+            function animate(now) {
+                const elapsed = now - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                const eased = 1 - Math.pow(1 - progress, 3); // ease-out cubic
+                wheelRotation = startRotation + totalRotation * eased;
 
                 if (progress < 1) {
-                    wheelRotation += (spins * 2 * Math.PI * progress) / 10;
                     drawWheel();
                     requestAnimationFrame(animate);
                 } else {
+                    const fullCircle = 2 * Math.PI;
+                    wheelRotation = ((wheelRotation % fullCircle) + fullCircle) % fullCircle;
                     isSpinning = false;
-                    const winnerIndex = Math.floor((wheelNames.length - (wheelRotation / (2 * Math.PI) % wheelNames.length)) % wheelNames.length);
-                    document.getElementById('wheelResult').innerHTML = `🎉 <strong>${wheelNames[winnerIndex]}</strong>`;
+                    drawWheel();
+
+                    const sliceAngle = fullCircle / wheelNames.length;
+                    const winnerIndex = Math.floor((wheelNames.length - wheelRotation / sliceAngle) % wheelNames.length);
+                    const winnerName = wheelNames[winnerIndex];
+                    lastWinnerName = winnerName;
+
+                    const autoRemove = document.getElementById('removeWinnerAuto').checked;
+                    if (autoRemove) {
+                        wheelNames.splice(winnerIndex, 1);
+                        updateNamesList();
+                        drawWheel();
+                        document.getElementById('wheelResult').innerHTML = `🎉 <strong>${winnerName}</strong> (removed)`;
+                        lastWinnerName = null;
+                    } else {
+                        document.getElementById('wheelResult').innerHTML = `🎉 <strong>${winnerName}</strong>`;
+                    }
                 }
             }
-            animate();
+            requestAnimationFrame(animate);
         }
 
         function clearWheel() {
             wheelNames = [];
+            lastWinnerName = null;
             document.getElementById('wheelResult').innerHTML = '';
             updateNamesList();
             drawWheel();
